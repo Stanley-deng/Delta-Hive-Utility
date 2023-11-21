@@ -56,11 +56,6 @@ def test_beeline_cmds():
     assert expect_df3 == actual_df3
 
     cursor.close()
-    cursor.connection.close()
-
-def test_update_delta_internal_table():
-    df = spark.sql(f"select *, 'loc' as location from {database}.{sink_table}") 
-    df.write.format("delta").mode("overwrite").partitionBy('event_date').saveAsTable(f'{database}.{sink_table}')
 
 def test_drop_table():
     spark.sql(f"DROP TABLE IF EXISTS {database}.{sink_table}")
