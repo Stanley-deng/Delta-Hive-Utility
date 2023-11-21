@@ -1,0 +1,12 @@
+tox
+pre-commit
+bumpversion
+black
+flake8
+isort
+mypy
+pytest
+pytest-cov
+coverage
+delta-spark==2.4.0
+pyspark==3.4.1

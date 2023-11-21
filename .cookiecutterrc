@@ -1,0 +1,38 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary python-delta-hive-connector-utility
+#
+# See:
+#    https://pypi.org/project/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=python-delta-hive-connector-utility/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+    command_line_interface:    'typer'
+    command_line_interface_bin_name: 'delta-hive-connector-utility'
+    distribution_name:         'delta-hive-connector-utility'
+    email:                     'ds_lab@cathayholdings.com.tw'
+    full_name:                 'Stanley'
+    package_name:              'delta_hive_connector_utility'
+    project_name:              'delta-hive-connector-utility'
+    project_short_description: 'test project'
+    release_date:              'today'
+    repo_hosting:              'gitlab.com'
+    repo_hosting_domain:       'gitlab.com'
+    repo_main_branch:          'main'
+    repo_name:                 'python-delta-hive-connector-utility'
+    repo_username:             'cathay_dslab'
+    sphinx_docs_hosting:       'https://python-delta-hive-connector-utility.readthedocs.io/'
+    sphinx_theme:              'sphinx-rtd-theme'
+    use_as:                    'library'
+    version:                   '0.0.0'
+    website:                   ''
+    year_from:                 '2023'
+    year_to:                   '2023'
