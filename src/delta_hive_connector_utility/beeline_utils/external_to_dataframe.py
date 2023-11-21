@@ -4,10 +4,11 @@ from pyspark.sql.types import *
 from delta import *
 
 def delta_external_to_dataframe(database, table, set_hive_connector=False):
-    cursor = hive.Connection(host="localhost", port=10000, \
+    conn = hive.Connection(host="localhost", port=10000, \
                            username="hadoop@ec2-57-180-27-135.ap-northeast-1.compute.amazonaws.com", \
-                           database="lab_stanley_db") \
-                           .cursor()
+                           database="lab_stanley_db") 
+    
+    cursor = conn.cursor()
 
     if set_hive_connector:
         cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
@@ -44,4 +45,7 @@ def delta_external_to_dataframe(database, table, set_hive_connector=False):
                 processed_row.append(str(value))
         df_data.append(tuple(processed_row))
 
+    conn.close()
+    cursor.close()
+    
     return df_data, df_schema

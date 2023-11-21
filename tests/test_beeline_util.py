@@ -38,7 +38,8 @@ def test_beeline_cmds():
     expect_df2 = [tuple(row) for row in spark.sql(f"select amount, count(*) as count from {database}.{sink_table} where amount = 6 group by amount").collect()]  
     expect_df3 = [tuple(row) for row in spark.sql(f"select event_date, sum(amount) as total_sales from {database}.{sink_table} where event_date = '2023-06' group by event_date").collect()]
 
-    cursor = hive.Connection(host="localhost", port=10000).cursor()
+    conn = hive.Connection(host="localhost", port=10000)
+    cursor = conn.cursor()
     
     cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
     cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
@@ -56,10 +57,9 @@ def test_beeline_cmds():
     assert expect_df3 == actual_df3
 
     cursor.close()
+    conn.close()
 
 def test_drop_table():
     spark.sql(f"DROP TABLE IF EXISTS {database}.{sink_table}")
     drop_table(database, sink_table+"_external")
     assert spark.catalog.tableExists(f"{database}.{sink_table}_external") == False
-
-    spark.stop()

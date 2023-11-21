@@ -26,6 +26,9 @@ spark.sql(f"DROP TABLE IF EXISTS {database}.{sink_table}")
 df = spark.sql(f"select * from {database}.{source_table}")
 df.write.format("delta").mode("overwrite").partitionBy('event_date').saveAsTable(f'{database}.{sink_table}')
 
+conn = hive.Connection(host="localhost", port=10000)
+cursor = conn.cursor()
+
 def test_add_column_to_internal():
     df = spark.sql(f"select * from {database}.{sink_table}")
     df = df.withColumn("location", lit('loc'))
@@ -35,8 +38,7 @@ def test_add_column_to_internal():
 
     # test query
     expected_df = [tuple(row) for row in df.collect()]
-    cursor = hive.Connection(host="localhost", port=10000).cursor()
-
+    
     cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
     cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
     cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
@@ -55,10 +57,11 @@ def test_remove_column_from_internal():
         update_external_schema(database, delta_path, sink_table, df.schema)
 
         # test query
-        cursor = hive.Connection(host="localhost", port=10000).cursor()
-
         cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
         cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
         cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
 
         cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
+
+        cursor.close()
+        conn.close()
