@@ -44,24 +44,24 @@ def test_add_column_to_internal():
     cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
 
     cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
-    actual_df1 = cursor.fetchall()
+    actual_df1 = spark.createDataFrame(cursor.fetchall(), df.schema)
 
     assert expected_df == actual_df1
     
 
 def test_remove_column_from_internal():
-    with pytest.raises(Exception):
-        spark.sql(f"ALTER TABLE {database}.{sink_table} DROP COLUMN location")
-        df = spark.sql(f"select * from {database}.{sink_table}")
-        # update external table schema
-        update_external_schema(database, delta_path, sink_table, df.schema)
+    # with pytest.raises(Exception):
+    spark.sql(f"ALTER TABLE {database}.{sink_table} DROP COLUMN location")
+    df = spark.sql(f"select * from {database}.{sink_table}")
+    # update external table schema
+    update_external_schema(database, delta_path, sink_table, df.schema)
 
-        # test query
-        cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
-        cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
-        cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
+    # test query
+    cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
+    cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
+    cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
 
-        cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
+    cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
 
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
