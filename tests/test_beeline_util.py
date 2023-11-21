@@ -17,7 +17,7 @@ source_table = "transaction_record_partitioned"
 sink_table = "beeline_test_table"
 delta_path = "s3://labstanleybucket/spark_sql_warehouse/lab_stanley_db.db"
 
-spark = configure_spark()
+spark = configure_spark(silent=True)
 
 spark.sql(f"DROP TABLE IF EXISTS {database}.{sink_table}") 
 df = spark.sql(f"select * from {database}.{source_table}")

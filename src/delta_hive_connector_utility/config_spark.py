@@ -3,7 +3,7 @@ from pyspark.conf import SparkConf
 from delta import *
 import os
 
-def configure_spark():
+def configure_spark(silent=False):
     os.environ["SPARK_HOME"] = "/usr/lib/spark" 
     os.environ["HADOOP_CONF_DIR"] = "/etc/hadoop/conf"
 
@@ -28,5 +28,8 @@ def configure_spark():
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
 
     spark = configure_spark_with_delta_pip(builder).getOrCreate()
+
+    if silent:
+        spark.sparkContext.setLogLevel("ERROR")
 
     return spark

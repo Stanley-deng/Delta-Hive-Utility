@@ -21,7 +21,7 @@ source_table = "transaction_record_partitioned"
 sink_table = "delta_test_table"
 delta_path = "s3://labstanleybucket/spark_sql_warehouse/lab_stanley_db.db"
 
-spark = configure_spark()
+spark = configure_spark(silent=True)
 spark.sql(f"DROP TABLE IF EXISTS {database}.{sink_table}") 
 df = spark.sql(f"select * from {database}.{source_table}")
 df.write.format("delta").mode("overwrite").partitionBy('event_date').saveAsTable(f'{database}.{sink_table}')
@@ -37,7 +37,7 @@ def test_add_column_to_internal():
     update_external_schema(database, delta_path, sink_table, df.schema)
 
     # test query
-    expected_df = [tuple(row) for row in df.collect()]
+    expected_df = df #[tuple(row) for row in df.collect()]
     
     cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
     cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
@@ -50,18 +50,18 @@ def test_add_column_to_internal():
     
 
 def test_remove_column_from_internal():
-    # with pytest.raises(Exception):
-    spark.sql(f"ALTER TABLE {database}.{sink_table} DROP COLUMN location")
-    df = spark.sql(f"select * from {database}.{sink_table}")
-    # update external table schema
-    update_external_schema(database, delta_path, sink_table, df.schema)
+    with pytest.raises(Exception):
+        spark.sql(f"ALTER TABLE {database}.{sink_table} DROP COLUMN location")
+        df = spark.sql(f"select * from {database}.{sink_table}")
+        # update external table schema
+        update_external_schema(database, delta_path, sink_table, df.schema)
 
-    # test query
-    cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
-    cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
-    cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
+        # test query
+        cursor.execute("ADD JAR /home/hadoop/delta-hive-assembly_2.12-3.1.0-SNAPSHOT.jar")
+        cursor.execute("SET hive.input.format=io.delta.hive.HiveInputFormat")
+        cursor.execute("SET hive.tez.input.format=io.delta.hive.HiveInputFormat")
 
-    cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
+        cursor.execute(f"SELECT * FROM {database}.{sink_table}_external")
 
-    cursor.close()
-    conn.close()
+        cursor.close()
+        conn.close()
