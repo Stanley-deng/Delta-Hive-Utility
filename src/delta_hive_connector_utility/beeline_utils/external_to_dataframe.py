@@ -45,7 +45,4 @@ def delta_external_to_dataframe(database, table, set_hive_connector=False):
                 processed_row.append(str(value))
         df_data.append(tuple(processed_row))
 
-    conn.close()
-    cursor.close()
-    
     return df_data, df_schema
